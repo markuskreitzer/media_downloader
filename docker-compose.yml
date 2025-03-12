@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: media-downloader:latest
     container_name: media-downloader
     ports:
       - "8000:8000"
@@ -11,7 +12,6 @@ services:
       - ./download_errors.log:/app/download_errors.log
     environment:
       - DOWNLOAD_DIR=/.downloads
-      - PLEX_ENABLED=true
       # Uncomment and set these for Plex integration
       # - PLEX_URL=http://plex-server:32400
       # - PLEX_TOKEN=your_plex_token

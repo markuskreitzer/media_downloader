@@ -92,6 +92,8 @@ def trigger_plex_scan() -> bool:
 async def download_media(request: DownloadRequest) -> Dict[str, str]:
     """Download media from the provided URL using yt-dlp."""
     url = str(request.url)
+    logger.info(f"URL: {request.url}")
+    logger.info(request)
     
     # Configure yt-dlp options
     ydl_opts = {
