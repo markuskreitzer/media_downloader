@@ -2,3 +2,6 @@
 .idea
 .venv
 .downloads
+.DS_Store
+.env 
+/.env

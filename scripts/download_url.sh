@@ -11,7 +11,7 @@ fi
 URL="$1"
 
 # API endpoint (modify if using a different host/port)
-API_ENDPOINT="http://localhost:8000/download/"
+API_ENDPOINT="http://patmos:8000/download/"
 
 echo "Sending download request for: $URL"
 
