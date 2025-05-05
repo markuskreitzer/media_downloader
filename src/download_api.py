@@ -2,6 +2,9 @@
 import argparse
 import logging
 import os
+import re
+import unicodedata
+import subprocess
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -42,6 +45,39 @@ plex_library: str = "Home Videos"
 
 class DownloadRequest(BaseModel):
     url: HttpUrl
+
+
+def sanitize_filename(filename: str, max_length: int = 255) -> str:
+    """
+    Sanitize filename to contain only UTF-8 characters and limit length.
+    
+    Args:
+        filename: Original filename
+        max_length: Maximum filename length (default: 255 for most filesystems)
+        
+    Returns:
+        Sanitized filename
+    """
+    # Normalize Unicode characters 
+    filename = unicodedata.normalize('NFC', filename)
+    
+    # Replace problematic characters with underscores
+    filename = re.sub(r'[\\/*?:"<>|]', '_', filename)
+    
+    # Ensure the filename isn't too long (accounting for extension)
+    name_parts = filename.rsplit('.', 1)
+    if len(name_parts) > 1:
+        name, ext = name_parts
+        # Truncate the name part, preserving the extension
+        if len(filename) > max_length:
+            max_name_length = max_length - len(ext) - 1  # -1 for the dot
+            name = name[:max_name_length]
+            filename = f"{name}.{ext}"
+    else:
+        # No extension, just truncate
+        filename = filename[:max_length]
+    
+    return filename
 
 
 def setup_plex() -> Optional[PlexServer]:
@@ -97,7 +133,7 @@ async def download_media(request: DownloadRequest) -> Dict[str, str]:
     
     # Configure yt-dlp options
     ydl_opts = {
-        'outtmpl': str(download_dir / '%(title)s.%(ext)s'),
+        'outtmpl': str(download_dir / '%(title).50s.%(ext)s'),
         'format': 'best',
         'noplaylist': True,
     }
@@ -106,8 +142,20 @@ async def download_media(request: DownloadRequest) -> Dict[str, str]:
         # Download the media
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
+            logger.info(f"INFO: {info}")
             filename = ydl.prepare_filename(info)
             file_path = Path(filename)
+            
+            # Sanitize the filename and rename if necessary
+            sanitized_path = Path(file_path.parent) / sanitize_filename(file_path.name)
+            if sanitized_path != file_path and file_path.exists():
+                file_path.rename(sanitized_path)
+                file_path = sanitized_path
+            
+            # Change file permissions to 777 for NAS share compatibility
+            if file_path.exists():
+                subprocess.run(['chmod', '777', str(file_path)], check=True)
+                logger.info(f"Changed permissions to 777 for {file_path}")
             
         # Try to trigger Plex scan if available
         plex_success = trigger_plex_scan() if plex_server else False
@@ -175,5 +223,3 @@ if __name__ == "__main__":
     # Start the FastAPI server using uvicorn
     import uvicorn
     uvicorn.run(app, host=args.host, port=args.port)
-
-
