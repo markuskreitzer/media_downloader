@@ -3,5 +3,6 @@
 .venv
 .downloads
 .DS_Store
-.env 
+.env
 /.env
+**/__pycache__/
