@@ -64,7 +64,17 @@ RABBITMQ_USE_SSL=false
 
 ### CloudAMQP Configuration
 
-If you're using CloudAMQP, use the following configuration:
+If you're using CloudAMQP, the easiest way to configure it is to copy the AMQP URL from your CloudAMQP dashboard and set it in your .env file:
+
+```
+# Using the full AMQP URL (recommended for CloudAMQP)
+RABBITMQ_URL=amqps://yourusername:yourpassword@host.rmq.cloudamqp.com/yourvhost
+
+# You still need to specify the queue name
+RABBITMQ_QUEUE=download_requests
+```
+
+Alternatively, you can split the settings into individual components:
 
 ```
 RABBITMQ_HOST=yourinstance.rmq.cloudamqp.com
@@ -73,6 +83,7 @@ RABBITMQ_USER=yourusername
 RABBITMQ_PASSWORD=yourpassword
 RABBITMQ_VHOST=yourvhost
 RABBITMQ_USE_SSL=true
+RABBITMQ_QUEUE=download_requests
 ```
 
 The application will automatically detect CloudAMQP hostnames and enable SSL.
@@ -137,6 +148,22 @@ If you're experiencing RabbitMQ connection issues:
 2. For CloudAMQP, make sure SSL is enabled (`RABBITMQ_USE_SSL=true`)
 3. Verify that the port is set to 5671 for SSL connections
 4. Check your CloudAMQP console for connection limits or other restrictions
+
+### ACCESS_REFUSED Errors
+
+If you see an `ACCESS_REFUSED` error:
+
+1. **Verify credentials**: Double-check your username and password
+2. **Check virtual host**: Make sure the virtual host exists and your user has access to it
+3. **AMQP URL format**: For CloudAMQP, copy the exact AMQP URL from your CloudAMQP dashboard
+4. **URL encoding**: If your password contains special characters, they need to be URL-encoded
+5. **Permissions**: Make sure your user has the right permissions for the virtual host
+
+For CloudAMQP, the easiest solution is to use the complete AMQP URL directly from your CloudAMQP dashboard:
+
+```
+RABBITMQ_URL=amqps://yourusername:yourpassword@host.rmq.cloudamqp.com/yourvhost
+```
 
 ## Optional Dependencies
 
