@@ -4,10 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile
     platform: linux/amd64
-    image: lyapunov/media-downloader:latest
+    image: ghcr.io/markuskreitzer/media-downloader:latest
     container_name: media-downloader
     ports:
-      - "8000:8000"
+      - "8001:8001"
     volumes:
       - ../Incoming:/.downloads
       - ./download_errors.log:/app/download_errors.log

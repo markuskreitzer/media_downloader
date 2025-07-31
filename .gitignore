@@ -116,3 +116,7 @@ dmypy.json
 # Downloaded files
 .downloads/
 download_errors.log
+
+# uv
+.uv/
+uv.lock.temp*

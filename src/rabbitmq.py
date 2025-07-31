@@ -14,8 +14,8 @@ except ImportError:
     AIO_PIKA_AVAILABLE = False
 
 from .config import logger, error_logger
-from .models import DownloadRequest
-from .routes import download_media
+from .models import DownloadRequest, VideoDownloadRequest, AudioDownloadRequest, PictureDownloadRequest, MediaType
+from .routes import download_media, download_video, download_audio, download_picture
 
 
 class RabbitMQConsumer:
@@ -119,17 +119,28 @@ class RabbitMQConsumer:
                 # Parse the message
                 data = json.loads(body)
                 url = data.get("url")
+                media_type = data.get("media_type", "video")  # Default to video for backward compatibility
                 
                 if not url:
                     logger.warning("Message missing 'url' field")
                     return
                 
-                # Create download request
+                # Create appropriate download request based on media type
                 try:
-                    request = DownloadRequest(url=url)
+                    if media_type == MediaType.AUDIO or media_type == "audio":
+                        request = AudioDownloadRequest(url=url)
+                        result = await download_audio(request)
+                    elif media_type == MediaType.PICTURE or media_type == "picture":
+                        request = PictureDownloadRequest(url=url)
+                        result = await download_picture(request)
+                    elif media_type == MediaType.VIDEO or media_type == "video":
+                        request = VideoDownloadRequest(url=url)
+                        result = await download_video(request)
+                    else:
+                        # Fall back to legacy endpoint for unknown types
+                        request = DownloadRequest(url=url)
+                        result = await download_media(request)
                     
-                    # Process the download request
-                    result = await download_media(request)
                     logger.info(f"Download completed: {result}")
                     
                 except Exception as e:

@@ -2,8 +2,8 @@
 from typing import Dict
 
 from fastapi import FastAPI
-from .models import DownloadRequest
-from .routes import download_media
+from .models import DownloadRequest, VideoDownloadRequest, AudioDownloadRequest, PictureDownloadRequest
+from .routes import download_media, download_video, download_audio, download_picture
 
 # FastAPI app
 app = FastAPI(
@@ -15,5 +15,20 @@ app = FastAPI(
 # Define routes
 @app.post("/download/", response_model=Dict[str, str])
 async def download_endpoint(request: DownloadRequest) -> Dict[str, str]:
-    """Download media from the provided URL."""
+    """Download media from the provided URL (legacy endpoint)."""
     return await download_media(request)
+
+@app.post("/download/video", response_model=Dict[str, str])
+async def download_video_endpoint(request: VideoDownloadRequest) -> Dict[str, str]:
+    """Download video from the provided URL with organized folder structure."""
+    return await download_video(request)
+
+@app.post("/download/audio", response_model=Dict[str, str])
+async def download_audio_endpoint(request: AudioDownloadRequest) -> Dict[str, str]:
+    """Download audio from the provided URL with organized folder structure."""
+    return await download_audio(request)
+
+@app.post("/download/picture", response_model=Dict[str, str])
+async def download_picture_endpoint(request: PictureDownloadRequest) -> Dict[str, str]:
+    """Download picture/thumbnail from the provided URL."""
+    return await download_picture(request)

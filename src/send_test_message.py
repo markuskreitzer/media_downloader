@@ -71,7 +71,7 @@ def parse_amqp_url(url: str):
         return {}
 
 
-def send_message(url, host, port, user, password, queue, vhost, use_ssl=False):
+def send_message(url, host, port, user, password, queue, vhost, media_type="video", use_ssl=False):
     """Send a test message to the RabbitMQ queue."""
     if not PIKA_AVAILABLE:
         print("Error: pika package is not installed.")
@@ -116,7 +116,7 @@ def send_message(url, host, port, user, password, queue, vhost, use_ssl=False):
         channel.queue_declare(queue=queue, durable=True)
         
         # Create message payload
-        message = json.dumps({"url": url})
+        message = json.dumps({"url": url, "media_type": media_type})
         
         # Publish message
         channel.basic_publish(
@@ -164,6 +164,13 @@ def main():
         "url",
         type=str,
         help="URL to download"
+    )
+    parser.add_argument(
+        "--media-type",
+        type=str,
+        choices=["video", "audio", "picture"],
+        default="video",
+        help="Type of media to download (default: video)"
     )
     parser.add_argument(
         "--amqp-url",
@@ -239,6 +246,7 @@ def main():
         password,
         args.queue,
         vhost,
+        args.media_type,
         use_ssl
     )
     
