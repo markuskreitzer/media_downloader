@@ -1,13 +1,13 @@
 # Multi-stage build for smaller final image
-FROM python:3.11-slim AS builder
+FROM python:3.11-alpine AS builder
 
 WORKDIR /app
 
 # Install build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apk add --no-cache \
     gcc \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
+    musl-dev \
+    g++
 
 # Upgrade pip
 RUN pip install --upgrade pip
@@ -20,14 +20,12 @@ COPY src ./src
 RUN pip install --no-cache-dir .[rabbitmq]
 
 # Final stage
-FROM python:3.11-slim
+FROM python:3.11-alpine
 
 WORKDIR /app
 
 # Install runtime dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache ffmpeg
 
 # Copy installed packages from builder
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
