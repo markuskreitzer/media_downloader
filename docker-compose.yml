@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     platform: linux/amd64
-    image: ghcr.io/markuskreitzer/media-downloader:latest
+    image: ghcr.io/markuskreitzer/media-downloader:master
     container_name: media-downloader
     ports:
       - "8000:8000"
