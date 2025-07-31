@@ -7,12 +7,12 @@ services:
     image: ghcr.io/markuskreitzer/media-downloader:latest
     container_name: media-downloader
     ports:
-      - "8001:8001"
+      - "8000:8000"
     volumes:
-      - ../Incoming:/.downloads
+      - ./downloads:/downloads
       - ./download_errors.log:/app/download_errors.log
     environment:
-      - DOWNLOAD_DIR=/.downloads
+      - DOWNLOAD_DIR=/downloads
       # Uncomment and set these for Plex integration
       # - PLEX_URL=http://plex-server:32400
       # - PLEX_TOKEN=your_plex_token

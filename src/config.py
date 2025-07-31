@@ -101,12 +101,12 @@ logger.debug(rabbitmq_url)
 logger.debug(rabbitmq_config)
 
 # RabbitMQ configuration (fall back to individual settings if URL not provided)
-rabbitmq_host: str = rabbitmq_config.get('host')
-rabbitmq_port: int = int(rabbitmq_config.get('port'))
-rabbitmq_user: str = rabbitmq_config.get('username')
-rabbitmq_password: str = rabbitmq_config.get('password')
+rabbitmq_host: str = rabbitmq_config.get('host') or os.getenv("RABBITMQ_HOST", "localhost")
+rabbitmq_port: int = int(rabbitmq_config.get('port') or os.getenv("RABBITMQ_PORT", "5672"))
+rabbitmq_user: str = rabbitmq_config.get('username') or os.getenv("RABBITMQ_USER", "guest")
+rabbitmq_password: str = rabbitmq_config.get('password') or os.getenv("RABBITMQ_PASSWORD", "guest")
 rabbitmq_queue: str = os.getenv("RABBITMQ_QUEUE", "music")
-rabbitmq_vhost: str = rabbitmq_config.get('vhost')
+rabbitmq_vhost: str = rabbitmq_config.get('vhost') or os.getenv("RABBITMQ_VHOST", "/")
 rabbitmq_use_ssl: bool = rabbitmq_config.get('use_ssl') or os.getenv("RABBITMQ_USE_SSL", "false").lower() in ("true", "1", "yes")
 
 # Detect CloudAMQP automatically
