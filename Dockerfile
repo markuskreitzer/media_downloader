@@ -16,9 +16,8 @@ RUN pip install --upgrade pip
 COPY pyproject.toml README.md ./
 COPY src ./src
 
-# Install dependencies
-RUN pip install --no-cache-dir . && \
-    pip install --no-cache-dir aio-pika pika plexapi
+# Install dependencies (only rabbitmq extras, plex is optional)
+RUN pip install --no-cache-dir .[rabbitmq]
 
 # Final stage
 FROM python:3.11-slim

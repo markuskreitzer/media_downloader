@@ -4,7 +4,12 @@ import os
 import re
 import urllib.parse
 from pathlib import Path
-from typing import Optional, Dict, Tuple
+from typing import Optional, Dict, Tuple, TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from plexapi.server import PlexServer
+else:
+    PlexServer = Any
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -31,12 +36,13 @@ plex_library: str = os.getenv("PLEX_LIBRARY", "Home Videos")
 
 # Try to import PlexAPI if available
 try:
-    from plexapi.server import PlexServer
+    from plexapi.server import PlexServer as _PlexServer
     PLEX_AVAILABLE = True
 except ImportError:
     PLEX_AVAILABLE = False
+    _PlexServer = None
 
-plex_server: Optional[PlexServer] = None
+plex_server: Optional['PlexServer'] = None
 
 
 def parse_amqp_url(url: str) -> Dict[str, str]:

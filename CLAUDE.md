@@ -10,6 +10,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Install dependencies
 uv sync --all-extras
 
+# Or install only what you need
+uv sync                    # Core dependencies only
+uv sync --extra rabbitmq   # Add RabbitMQ support
+uv sync --extra plex       # Add Plex integration
+uv sync --extra dev        # Add development tools
+
 # Run locally with default settings
 uv run python -m src.main
 

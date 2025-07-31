@@ -46,7 +46,12 @@ uv sync --all-extras
 uv sync
 
 # Or install with specific extras
-uv sync --extra rabbitmq --extra plex
+uv sync --extra rabbitmq --extra plex --extra dev
+
+# Available extras:
+# - rabbitmq: RabbitMQ integration (aio-pika, pika)  
+# - plex: Plex Media Server integration (plexapi)
+# - dev: Development tools (pytest, black, mypy, etc.)
 ```
 
 4. Create a `.env` file based on `.env.example`:
