@@ -1,6 +1,8 @@
 # Multi-stage build for smaller final image
 FROM python:3.11-alpine AS builder
 
+LABEL org.opencontainers.image.description "A Python API service for downloading media from URLs via HTTP endpoints and RabbitMQ messaging with yt-dlp"
+
 WORKDIR /app
 
 # Install build dependencies
