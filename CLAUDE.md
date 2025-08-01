@@ -2,19 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Git Commit Attribution
+## Git Commit Guidelines
 
-When making commits with Claude, please add attribution to the commit message:
-
-```
-Your commit message here
-
-🤖 Generated with [Claude Code](https://claude.ai/code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
-```
-
-This helps track which commits were made with AI assistance.
+**IMPORTANT**: Do NOT add Claude Code attribution or co-author information to commit messages. 
+Make clean commits with just the commit message and no AI attribution.
 
 ## Common Commands
 
