@@ -13,12 +13,12 @@ def sanitize_filename(filename: str, max_length: int = 255) -> str:
     Returns:
         Sanitized filename
     """
-    # Normalize Unicode characters 
+    # Normalize Unicode characters
     filename = unicodedata.normalize('NFC', filename)
-    
+
     # Replace problematic characters with underscores
     filename = re.sub(r'[\\/*?:"<>|]', '_', filename)
-    
+
     # Ensure the filename isn't too long (accounting for extension)
     name_parts = filename.rsplit('.', 1)
     if len(name_parts) > 1:
@@ -31,5 +31,5 @@ def sanitize_filename(filename: str, max_length: int = 255) -> str:
     else:
         # No extension, just truncate
         filename = filename[:max_length]
-    
+
     return filename

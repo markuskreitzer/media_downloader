@@ -2,23 +2,24 @@ import json
 import logging
 import os
 import ssl
+from typing import Any
 import pika
 
 logging.basicConfig(level=logging.INFO)
 
 
-RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST")
-RABBITMQ_PORT = int(os.environ.get("RABBITMQ_PORT", 5671))
-RABBITMQ_USER = os.environ.get("RABBITMQ_USER")
-RABBITMQ_PASS = os.environ.get("RABBITMQ_PASS")
-RABBITMQ_VHOST = os.environ.get("RABBITMQ_USER") # Same as username in CloudAMQP
+RABBITMQ_HOST = os.environ.get("RABBITMQ_HOST", "localhost")
+RABBITMQ_PORT = int(os.environ.get("RABBITMQ_PORT", "5671"))
+RABBITMQ_USER = os.environ.get("RABBITMQ_USER", "guest")
+RABBITMQ_PASS = os.environ.get("RABBITMQ_PASS", "guest")
+RABBITMQ_VHOST = os.environ.get("RABBITMQ_VHOST", "/") # Default to root vhost
 QUEUE_NAME = os.environ.get('QUEUE_NAME', 'music')
 
 # --- Set to False during testing if you DON'T want to delete messages ---
 # --- Set to True for normal operation to remove processed messages ---
 ACKNOWLEDGE_MESSAGES = True
 
-def process_message(ch, method, properties, body):
+def process_message(ch: Any, method: Any, properties: Any, body: bytes) -> None:
     """Callback function executed when a message is received."""
     print(f" [x] Received message from queue '{QUEUE_NAME}'")
     print(f"     Delivery Tag: {method.delivery_tag}")
@@ -52,7 +53,7 @@ def process_message(ch, method, properties, body):
             # If this consumer disconnects, RabbitMQ will re-queue it.
 
     except json.JSONDecodeError:
-        print(f" [!] Error: Could not decode JSON: {body}")
+        print(f" [!] Error: Could not decode JSON: {body.decode('utf-8', errors='replace')}")
         # Decide how to handle invalid messages:
         # Option 1: Reject and discard
         # ch.basic_reject(delivery_tag=method.delivery_tag, requeue=False)
@@ -69,7 +70,7 @@ def process_message(ch, method, properties, body):
         print(" [!] Message NOT acknowledged due to processing error.")
 
 
-def pull_from_rabbitmq(host, port, vhost, username, password, queue, ack_messages=True):
+def pull_from_rabbitmq(host: str, port: int, vhost: str, username: str, password: str, queue: str, ack_messages: bool = True) -> None:
     """Connects to RabbitMQ and consumes messages from the specified queue."""
     global ACKNOWLEDGE_MESSAGES
     ACKNOWLEDGE_MESSAGES = ack_messages # Use the flag passed to the function

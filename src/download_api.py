@@ -58,12 +58,12 @@ def sanitize_filename(filename: str, max_length: int = 255) -> str:
     Returns:
         Sanitized filename
     """
-    # Normalize Unicode characters 
+    # Normalize Unicode characters
     filename = unicodedata.normalize('NFC', filename)
-    
+
     # Replace problematic characters with underscores
     filename = re.sub(r'[\\/*?:"<>|]', '_', filename)
-    
+
     # Ensure the filename isn't too long (accounting for extension)
     name_parts = filename.rsplit('.', 1)
     if len(name_parts) > 1:
@@ -76,7 +76,7 @@ def sanitize_filename(filename: str, max_length: int = 255) -> str:
     else:
         # No extension, just truncate
         filename = filename[:max_length]
-    
+
     return filename
 
 
@@ -84,14 +84,14 @@ def setup_plex() -> Optional[PlexServer]:
     """Connect to Plex server if configuration is available."""
     if not PLEX_AVAILABLE:
         return None
-    
+
     plex_url = os.environ.get("PLEX_URL")
     plex_token = os.environ.get("PLEX_TOKEN")
-    
+
     if not plex_url or not plex_token:
         logger.warning("Plex URL or token not configured. Skipping Plex integration.")
         return None
-    
+
     try:
         return PlexServer(plex_url, plex_token)
     except Exception as e:
@@ -101,20 +101,19 @@ def setup_plex() -> Optional[PlexServer]:
 
 def trigger_plex_scan() -> bool:
     """Trigger Plex to scan for new files."""
-    global plex_server, plex_library
-    
+
     if not plex_server:
         return False
-    
+
     try:
         # Find the appropriate library
-        library = next((section for section in plex_server.library.sections() 
+        library = next((section for section in plex_server.library.sections()
                        if section.title == plex_library), None)
-        
+
         if not library:
             logger.warning(f"Library '{plex_library}' not found in Plex server")
             return False
-            
+
         # Update the library to scan for new files
         library.update()
         logger.info(f"Triggered Plex library scan for {plex_library}")
@@ -130,14 +129,14 @@ async def download_media(request: DownloadRequest) -> Dict[str, str]:
     url = str(request.url)
     logger.info(f"URL: {request.url}")
     logger.info(request)
-    
+
     # Configure yt-dlp options
     ydl_opts = {
         'outtmpl': str(download_dir / '%(title).50s.%(ext)s'),
         'format': 'best',
         'noplaylist': True,
     }
-    
+
     try:
         # Download the media
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -145,21 +144,21 @@ async def download_media(request: DownloadRequest) -> Dict[str, str]:
             logger.info(f"INFO: {info}")
             filename = ydl.prepare_filename(info)
             file_path = Path(filename)
-            
+
             # Sanitize the filename and rename if necessary
             sanitized_path = Path(file_path.parent) / sanitize_filename(file_path.name)
             if sanitized_path != file_path and file_path.exists():
                 file_path.rename(sanitized_path)
                 file_path = sanitized_path
-            
+
             # Change file permissions to 777 for NAS share compatibility
             if file_path.exists():
                 subprocess.run(['chmod', '777', str(file_path)], check=True)
                 logger.info(f"Changed permissions to 777 for {file_path}")
-            
+
         # Try to trigger Plex scan if available
         plex_success = trigger_plex_scan() if plex_server else False
-            
+
         return {
             "status": "success",
             "message": f"Downloaded media from {url}",
@@ -169,7 +168,7 @@ async def download_media(request: DownloadRequest) -> Dict[str, str]:
     except yt_dlp.utils.DownloadError as e:
         # Log the error to the error log file
         error_logger.error(f"Error downloading {url}: {str(e)}")
-        
+
         # Raise HTTP exception
         raise HTTPException(
             status_code=400,
@@ -178,7 +177,7 @@ async def download_media(request: DownloadRequest) -> Dict[str, str]:
     except Exception as e:
         # Log the error to the error log file
         error_logger.error(f"Unexpected error downloading {url}: {str(e)}")
-        
+
         # Raise HTTP exception
         raise HTTPException(
             status_code=500,
@@ -190,36 +189,36 @@ if __name__ == "__main__":
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="Media Downloader API")
     parser.add_argument(
-        "--download-dir", 
-        type=str, 
+        "--download-dir",
+        type=str,
         default=os.environ.get("DOWNLOAD_DIR", "./.downloads"),
         help="Directory to save downloaded files (default: ./.downloads or DOWNLOAD_DIR env var)"
     )
     parser.add_argument(
-        "--host", 
-        type=str, 
+        "--host",
+        type=str,
         default="0.0.0.0",
         help="Host to bind the server to (default: 0.0.0.0)"
     )
     parser.add_argument(
-        "--port", 
-        type=int, 
+        "--port",
+        type=int,
         default=8000,
         help="Port to bind the server to (default: 8000)"
     )
-    
+
     args = parser.parse_args()
-    
+
     # Set up download directory
     download_dir = Path(args.download_dir)
     download_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Set up Plex integration
     plex_server = setup_plex()
     plex_library = os.environ.get("PLEX_LIBRARY", plex_library)
-    
+
     logger.info(f"Starting server, download directory set to: {download_dir}")
-    
+
     # Start the FastAPI server using uvicorn
     import uvicorn
     uvicorn.run(app, host=args.host, port=args.port)

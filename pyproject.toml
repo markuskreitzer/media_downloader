@@ -41,7 +41,7 @@ dev = [
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
     "pytest-cov>=4.0.0",
-    "flake8>=6.0.0",
+    "ruff>=0.1.0",
     "black>=23.0.0",
     "mypy>=1.0.0",
     "httpx>=0.24.0",
@@ -68,7 +68,7 @@ dev-dependencies = [
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
     "pytest-cov>=4.0.0",
-    "flake8>=6.0.0",
+    "ruff>=0.1.0",
     "black>=23.0.0",
     "mypy>=1.0.0",
     "httpx>=0.24.0",
@@ -124,6 +124,37 @@ exclude_lines = [
     "if 0:",
     "if __name__ == .__main__.:",
 ]
+
+[tool.ruff]
+# Same as flake8 settings
+line-length = 127
+target-version = "py38"
+
+[tool.ruff.lint]
+# Enable flake8-bugbear (`B`) rules, in addition to the `E` and `F` rules.
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # Pyflakes
+    "B",  # flake8-bugbear
+    "C90", # mccabe complexity
+]
+
+# Same ignore patterns as the current flake8 setup
+ignore = [
+    "E501",  # Line too long (we use line-length instead)
+]
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.mccabe]
+# Unlike Flake8, default to a complexity level of 10.
+max-complexity = 10
+
+[tool.ruff.lint.extend-per-file-ignores]
+# Tests can use magic values, assertions, and longer lines
+"tests/*" = ["E501", "B011"]
 
 [tool.deptry]
 pep621_dev_dependency_groups = ["dev"]

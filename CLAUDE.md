@@ -34,9 +34,14 @@ uv run pytest tests/test_routes.py
 # Run with coverage
 uv run pytest --cov=src
 
-# Run linting
-uv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-uv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+# Run linting with Ruff (replaces Flake8)
+uv run ruff check .                    # Check for linting issues
+uv run ruff check . --fix              # Auto-fix issues where possible
+uv run ruff format .                   # Format code (can replace black)
+
+# Legacy Flake8 commands (use Ruff instead)
+# uv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+# uv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
 # Format code with black
 uv run black src tests

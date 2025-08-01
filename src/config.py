@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 import logging
 import os
-import re
 import urllib.parse
 from pathlib import Path
-from typing import Optional, Dict, Tuple, TYPE_CHECKING, Any
+from typing import Optional, Dict, TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from plexapi.server import PlexServer
@@ -45,7 +44,7 @@ except ImportError:
 plex_server: Optional['PlexServer'] = None
 
 
-def parse_amqp_url(url: str) -> Dict[str, str]:
+def parse_amqp_url(url: str) -> Dict[str, Any]:
     """Parse an AMQP URL into components for RabbitMQ connection.
 
     Handles both standard AMQP URLs and CloudAMQP-style URLs.
@@ -88,10 +87,10 @@ def parse_amqp_url(url: str) -> Dict[str, str]:
         vhost = urllib.parse.unquote(vhost)
 
         return {
-            'host': parsed.hostname,
+            'host': parsed.hostname or 'localhost',
             'port': port,
-            'username': username,
-            'password': password,
+            'username': username or 'guest',
+            'password': password or 'guest',
             'vhost': vhost,
             'use_ssl': use_ssl
         }
@@ -107,13 +106,13 @@ logger.debug(rabbitmq_url)
 logger.debug(rabbitmq_config)
 
 # RabbitMQ configuration (fall back to individual settings if URL not provided)
-rabbitmq_host: str = rabbitmq_config.get('host') or os.getenv("RABBITMQ_HOST", "localhost")
-rabbitmq_port: int = int(rabbitmq_config.get('port') or os.getenv("RABBITMQ_PORT", "5672"))
-rabbitmq_user: str = rabbitmq_config.get('username') or os.getenv("RABBITMQ_USER", "guest")
-rabbitmq_password: str = rabbitmq_config.get('password') or os.getenv("RABBITMQ_PASSWORD", "guest")
+rabbitmq_host: str = str(rabbitmq_config.get('host') or os.getenv("RABBITMQ_HOST", "localhost"))
+rabbitmq_port: int = int(str(rabbitmq_config.get('port') or os.getenv("RABBITMQ_PORT", "5672")))
+rabbitmq_user: str = str(rabbitmq_config.get('username') or os.getenv("RABBITMQ_USER", "guest"))
+rabbitmq_password: str = str(rabbitmq_config.get('password') or os.getenv("RABBITMQ_PASSWORD", "guest"))
 rabbitmq_queue: str = os.getenv("RABBITMQ_QUEUE", "music")
-rabbitmq_vhost: str = rabbitmq_config.get('vhost') or os.getenv("RABBITMQ_VHOST", "/")
-rabbitmq_use_ssl: bool = rabbitmq_config.get('use_ssl') or os.getenv("RABBITMQ_USE_SSL", "false").lower() in ("true", "1", "yes")
+rabbitmq_vhost: str = str(rabbitmq_config.get('vhost') or os.getenv("RABBITMQ_VHOST", "/"))
+rabbitmq_use_ssl: bool = bool(rabbitmq_config.get('use_ssl') or os.getenv("RABBITMQ_USE_SSL", "false").lower() in ("true", "1", "yes"))
 
 # Detect CloudAMQP automatically
 if "cloudamqp.com" in rabbitmq_host:

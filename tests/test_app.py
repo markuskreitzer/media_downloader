@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-import pytest
 from fastapi.testclient import TestClient
 import sys
-import os
 from pathlib import Path
 
 # Add the parent directory to sys.path
@@ -22,7 +20,7 @@ def test_app_startup():
 def test_invalid_url():
     """Test that invalid URLs are rejected."""
     response = client.post(
-        "/download/", 
+        "/download/",
         json={"url": "not-a-valid-url"}
     )
     assert response.status_code == 422  # Validation error

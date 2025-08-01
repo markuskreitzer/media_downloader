@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-import pytest
-import os
-from urllib.parse import urlparse
 import sys
 from pathlib import Path
 
@@ -15,7 +12,7 @@ def test_parse_amqp_url_complete():
     """Test parsing a complete AMQP URL."""
     url = "amqp://user:pass@host:5672/vhost"
     result = parse_amqp_url(url)
-    
+
     assert result["host"] == "host"
     assert result["port"] == 5672
     assert result["username"] == "user"
@@ -27,7 +24,7 @@ def test_parse_amqp_url_ssl():
     """Test parsing an AMQPS URL."""
     url = "amqps://user:pass@host:5671/vhost"
     result = parse_amqp_url(url)
-    
+
     assert result["host"] == "host"
     assert result["port"] == 5671
     assert result["username"] == "user"
@@ -39,7 +36,7 @@ def test_parse_amqp_url_no_port():
     """Test parsing a URL without a port."""
     url = "amqp://user:pass@host/vhost"
     result = parse_amqp_url(url)
-    
+
     assert result["host"] == "host"
     assert result["port"] == 5672  # Default port
     assert result["username"] == "user"
@@ -51,7 +48,7 @@ def test_parse_amqp_url_no_vhost():
     """Test parsing a URL without a vhost."""
     url = "amqp://user:pass@host:5672"
     result = parse_amqp_url(url)
-    
+
     assert result["host"] == "host"
     assert result["port"] == 5672
     assert result["username"] == "user"
@@ -63,7 +60,7 @@ def test_parse_amqp_url_special_chars():
     """Test parsing a URL with special characters."""
     url = "amqp://user:p%40ss@host:5672/vho%2Fst"
     result = parse_amqp_url(url)
-    
+
     assert result["host"] == "host"
     assert result["port"] == 5672
     assert result["username"] == "user"
