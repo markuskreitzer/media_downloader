@@ -68,6 +68,10 @@ class RabbitMQConsumer:
                 self.vhost = f"/{self.vhost}"
 
             connection_string = f"{amqp_protocol}://{self.username}:{self.password}@{self.host}:{self.port}{self.vhost}"
+            
+            # Log connection attempt (mask password)
+            masked_url = f"{amqp_protocol}://{self.username}:****@{self.host}:{self.port}{self.vhost}"
+            logger.info(f"Attempting to connect to RabbitMQ: {masked_url}")
 
             # Connect with robust connection (automatic reconnection)
             self.connection = await aio_pika.connect_robust(

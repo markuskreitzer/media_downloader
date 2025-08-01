@@ -1,16 +1,20 @@
 services:
   media-downloader:
     platform: linux/amd64
-    image: ghcr.io/markuskreitzer/media-downloader:master
+    image: ghcr.io/markuskreitzer/media_downloader:master
+    pull_policy: always
     container_name: media-downloader
     ports:
       - "8001:8000"
     volumes:
       - /volume2/Media/Incoming:/downloads
       - ./download_errors.log:/app/download_errors.log
+    env_file:
+      - .env
     environment:
       - DOWNLOAD_DIR=/downloads
-      - RABBITMQ_URL='amqps://qiolkpyk:Illwe3BnIJFQb062nM-r7CmcD24ApwKg@campbell.lmq.cloudamqp.com:5671/qiolkpyk'
+      - RABBITMQ_REQUIRED=true
+      # Environment variables here override those in .env file
       # Uncomment and set these for Plex integration
       # - PLEX_URL=http://plex-server:32400
       # - PLEX_TOKEN=your_plex_token

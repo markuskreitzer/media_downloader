@@ -57,6 +57,9 @@ def parse_amqp_url(url: str) -> Dict[str, Any]:
     """
     if not url:
         return {}
+    
+    # Strip any surrounding quotes that might come from environment variables
+    url = url.strip().strip("'\"")
 
     # Check if it's already a properly formatted URL
     if not url.startswith(('amqp://', 'amqps://')):
@@ -101,9 +104,14 @@ def parse_amqp_url(url: str) -> Dict[str, Any]:
 
 # Try to get RabbitMQ config from URL first
 rabbitmq_url = os.getenv("RABBITMQ_URL")
-rabbitmq_config = parse_amqp_url(rabbitmq_url) if rabbitmq_url else {}
-logger.debug(rabbitmq_url)
-logger.debug(rabbitmq_config)
+if rabbitmq_url:
+    logger.info(f"RABBITMQ_URL found: {rabbitmq_url[:30]}..." if len(rabbitmq_url) > 30 else f"RABBITMQ_URL found: {rabbitmq_url}")
+    rabbitmq_config = parse_amqp_url(rabbitmq_url)
+else:
+    logger.warning("RABBITMQ_URL not found in environment variables")
+    rabbitmq_config = {}
+
+logger.debug(f"Parsed RabbitMQ config: {rabbitmq_config}")
 
 # RabbitMQ configuration (fall back to individual settings if URL not provided)
 rabbitmq_host: str = str(rabbitmq_config.get('host') or os.getenv("RABBITMQ_HOST", "localhost"))
@@ -122,7 +130,19 @@ if "cloudamqp.com" in rabbitmq_host:
         rabbitmq_port = 5671
     rabbitmq_use_ssl = True
 
+# Check if RabbitMQ is required
+rabbitmq_required = os.getenv("RABBITMQ_REQUIRED", "false").lower() in ("true", "1", "yes")
+
+# Validate RabbitMQ configuration if required
+if rabbitmq_required and not rabbitmq_url:
+    logger.error("RABBITMQ_URL is required but not set. Please set the RABBITMQ_URL environment variable.")
+    raise ValueError("RABBITMQ_URL is required but not set")
+
 # Log configuration for debugging
-logger.info(f"RabbitMQ configuration: {rabbitmq_host}:{rabbitmq_port}, vhost: {rabbitmq_vhost}")
+if rabbitmq_url:
+    logger.info(f"RabbitMQ configured at {rabbitmq_host}:{rabbitmq_port}, queue: {rabbitmq_queue}")
+else:
+    logger.info(f"RabbitMQ configuration: {rabbitmq_host}:{rabbitmq_port}, vhost: {rabbitmq_vhost}")
+    
 if rabbitmq_use_ssl:
     logger.info("Using SSL for RabbitMQ connection")
