@@ -36,8 +36,15 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy application code
 COPY src ./src
 
-# Create downloads directory
-RUN mkdir -p /downloads && chmod 777 /downloads
+# Create directories
+RUN mkdir -p /downloads /tmp/cookies /var/log && chmod 777 /downloads /tmp/cookies /var/log
+
+# Copy update script
+COPY scripts/update-ytdlp.sh /usr/local/bin/update-ytdlp.sh
+RUN chmod +x /usr/local/bin/update-ytdlp.sh
+
+# Set up cron for daily updates
+RUN echo "0 3 * * * /usr/local/bin/update-ytdlp.sh >> /var/log/yt-dlp-update.log 2>&1" | crontab -
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1 \

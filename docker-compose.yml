@@ -6,9 +6,10 @@ services:
     container_name: media-downloader
     ports:
       - "8001:8000"
-    volumes:
-      - /volume2/Media/Incoming:/downloads
-      - ./download_errors.log:/app/download_errors.log
+     volumes:
+        - /volume2/Media/Incoming:/downloads
+        - ./download_errors.log:/app/download_errors.log
+        - ./cookies:/app/cookies:ro
     env_file:
       - .env
     environment:

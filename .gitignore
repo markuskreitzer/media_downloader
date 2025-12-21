@@ -117,6 +117,10 @@ dmypy.json
 .downloads/
 download_errors.log
 
+# Browser cookies - never commit these!
+cookies/
+*.txt
+
 # uv
 .uv/
 uv.lock.temp*

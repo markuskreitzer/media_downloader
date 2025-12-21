@@ -1,0 +1,6 @@
+# Add to your crontab with: crontab -e
+# Run daily at 3 AM (adjust time as needed)
+0 3 * * * /Users/c/Library/CloudStorage/SynologyDrive-Media/media-downloader/scripts/update-ytdlp.sh >> /var/log/yt-dlp-update.log 2>&1
+
+# Alternative: Run every 6 hours if you want more frequent updates
+# 0 */6 * * * /Users/c/Library/CloudStorage/SynologyDrive-Media/media-downloader/scripts/update-ytdlp.sh >> /var/log/yt-dlp-update.log 2>&1
