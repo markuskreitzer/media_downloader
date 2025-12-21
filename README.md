@@ -10,8 +10,13 @@ A Python API service for downloading media from URLs via HTTP endpoints and Rabb
 - HTTP API endpoints for direct requests
 - RabbitMQ integration for asynchronous processing
 - Plex Media Server integration for automatic library updates
+- YouTube cookies support for bypassing 403 errors
+- Automated yt-dlp updates with included script
+- Enhanced URL parsing and validation
+- Debug logging and error tracking
 - Environment variable configuration with dotenv support
 - Docker support for easy deployment
+- Utility scripts for automation and testing
 
 ## Project Structure
 
@@ -24,6 +29,14 @@ A Python API service for downloading media from URLs via HTTP endpoints and Rabb
 - **src/rabbitmq.py**: RabbitMQ consumer for processing download requests
 - **src/main.py**: Application entry point
 - **src/send_test_message.py**: Utility for testing RabbitMQ integration
+- **src/consume_rabbitmq.py**: RabbitMQ consumer standalone script
+- **src/download_api.py**: Download API standalone script
+- **src/rabbitmq_debug.py**: Debug utilities for RabbitMQ
+- **src/url_extractor.py**: URL parsing and validation utilities
+- **scripts/**: Automation and maintenance scripts
+  - **update-ytdlp.sh**: Automated yt-dlp updater
+  - **download_url.sh**: Direct download script
+  - **crontab.example**: Example cron configuration
 
 ## Installation
 
@@ -51,7 +64,7 @@ uv sync --extra rabbitmq --extra plex --extra dev
 # Available extras:
 # - rabbitmq: RabbitMQ integration (aio-pika, pika)  
 # - plex: Plex Media Server integration (plexapi)
-# - dev: Development tools (pytest, black, mypy, etc.)
+# - dev: Development tools (pytest, ruff, black, mypy, etc.)
 ```
 
 4. Create a `.env` file based on `.env.example`:
@@ -200,7 +213,7 @@ To set up the CI/CD pipeline:
 
 ### HTTP Endpoints
 
-The API provides separate endpoints for different media types:
+The API provides separate endpoints for different media types with enhanced error handling and logging:
 
 #### Video Download
 Send a POST request to `/download/video` with a JSON body:
@@ -273,7 +286,8 @@ Send a message to the configured RabbitMQ queue with the following JSON format:
 You can use the included utility script to send a test message:
 
 ```bash
-python -m src.send_test_message "https://example.com/video.mp4"
+uv run python -m src.send_test_message "https://example.com/video.mp4"
+uv run send-test-message "https://example.com/video.mp4" --media-type audio
 ```
 
 ### File Organization
@@ -321,6 +335,56 @@ For CloudAMQP, the easiest solution is to use the complete AMQP URL directly fro
 ```
 RABBITMQ_URL=amqps://yourusername:yourpassword@host.rmq.cloudamqp.com/yourvhost
 ```
+
+### YouTube 403 Forbidden Errors
+
+If you encounter 403 errors when downloading YouTube content:
+
+1. **Configure cookies**: Follow the setup guide in `COOKIE_SETUP.md`
+2. **Check cookies file**: Ensure the cookies file is accessible and not expired
+3. **Update yt-dlp**: Run `./scripts/update-ytdlp.sh` to get the latest version
+4. **Debug logging**: Check logs for detailed error information
+
+## YouTube Cookies Support
+
+For downloading YouTube content that may encounter 403 Forbidden errors, you can configure browser cookies:
+
+1. **Setup Cookies**: See `COOKIE_SETUP.md` for detailed instructions
+2. **Environment Variables**:
+   ```
+   YOUTUBE_COOKIES_FILE=/path/to/cookies.txt
+   ```
+3. **Docker Volume Mount**:
+   ```yaml
+   volumes:
+     - ./cookies:/app/cookies:ro
+   ```
+
+## Automated yt-dlp Updates
+
+Use the included script to keep yt-dlp up to date:
+
+```bash
+./scripts/update-ytdlp.sh
+```
+
+You can also set up a cron job for automatic updates (see `scripts/crontab.example`).
+
+## Utility Scripts
+
+The project includes several utility scripts:
+
+- **`scripts/update-ytdlp.sh`**: Automated yt-dlp updater
+- **`scripts/download_url.sh`**: Direct download script for batch processing
+- **`scripts/crontab.example`**: Example cron configuration for automation
+
+## Debug Logging
+
+Enhanced logging includes:
+- Detailed download progress
+- Error tracking to `download_errors.log`
+- Debug information for troubleshooting
+- RabbitMQ connection status
 
 ## Optional Dependencies
 
