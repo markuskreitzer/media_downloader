@@ -11,7 +11,6 @@ try:
 except ImportError:
     AIO_PIKA_AVAILABLE = False
 
-import re
 
 from .config import logger, error_logger
 from .models import DownloadRequest, VideoDownloadRequest, AudioDownloadRequest, PictureDownloadRequest, MediaType
@@ -70,7 +69,7 @@ class RabbitMQConsumer:
                 self.vhost = f"/{self.vhost}"
 
             connection_string = f"{amqp_protocol}://{self.username}:{self.password}@{self.host}:{self.port}{self.vhost}"
-            
+
             # Log connection attempt (mask password)
             masked_url = f"{amqp_protocol}://{self.username}:****@{self.host}:{self.port}{self.vhost}"
             logger.info(f"Attempting to connect to RabbitMQ: {masked_url}")
@@ -120,29 +119,6 @@ class RabbitMQConsumer:
                 body = message.body.decode()
                 logger.info(f"Received message from RabbitMQ: {body}")
 
-                # Extract URLs using improved extractor
-                urls = extract_urls_from_message(data)
-                url = get_primary_url(urls) if urls else None
-                
-                media_type = data.get("media_type", "video")  # Default to video for backward compatibility
-                logger.info(f"DEBUG: Extracted {len(urls)} URLs, primary: {url}, media_type: {media_type}")
-
-                if not url:
-                    logger.warning(f"No valid URLs found in message. Available keys: {list(data.keys())}")
-                    logger.warning(f"DEBUG: Full message data: {json.dumps(data, indent=2)}")
-                    return
-                    
-                    # Validate URL
-                    if not validate_url(url):
-                        logger.warning(f"Invalid URL format: {url}")
-                        return
-                    return
-
-        async with message.process():
-            try:
-                body = message.body.decode()
-                logger.info(f"Received message from RabbitMQ: {body}")
-
                 # Parse the message
                 data = json.loads(body)
                 url = data.get("url")
@@ -151,12 +127,6 @@ class RabbitMQConsumer:
                 if not url:
                     logger.warning(f"No valid URLs found in message. Available keys: {list(data.keys())}")
                     logger.warning(f"DEBUG: Full message data: {json.dumps(data, indent=2)}")
-                    return
-                    
-                    # Validate URL
-                    if not validate_url(url):
-                        logger.warning(f"Invalid URL format: {url}")
-                        return
                     return
 
                 # Create appropriate download request based on media type

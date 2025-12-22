@@ -10,7 +10,7 @@ from contextlib import asynccontextmanager
 
 from .app import app
 from .config import (
-    logger, download_dir, rabbitmq_host, rabbitmq_port, rabbitmq_user,
+    logger, rabbitmq_host, rabbitmq_port, rabbitmq_user,
     rabbitmq_password, rabbitmq_queue, rabbitmq_vhost,
     rabbitmq_use_ssl
 )
@@ -143,8 +143,7 @@ def main() -> None:
     args_download_dir.mkdir(parents=True, exist_ok=True)
 
     # Set up Plex integration
-    from .config import plex_server
-    plex_server = setup_plex()
+    setup_plex()
 
     # Update environment variables for RabbitMQ if available
     if AIO_PIKA_AVAILABLE and hasattr(args, 'rabbitmq_host'):

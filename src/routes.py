@@ -15,7 +15,7 @@ from .plex import trigger_plex_scan
 def _get_organized_path(info: dict, media_type: MediaType, base_dir: Path) -> Path:
     """
     Organize files based on metadata and media type.
-    
+
     For music/audio: artist/album/title
     For videos: channel/title or channel/series/title
     For pictures: downloads/pictures/

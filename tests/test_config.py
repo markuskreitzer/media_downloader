@@ -18,7 +18,7 @@ def test_parse_amqp_url_complete():
     assert result["username"] == "user"
     assert result["password"] == "pass"
     assert result["vhost"] == "vhost"
-    assert result["use_ssl"] == False
+    assert not result["use_ssl"]
 
 def test_parse_amqp_url_ssl():
     """Test parsing an AMQPS URL."""
@@ -30,7 +30,7 @@ def test_parse_amqp_url_ssl():
     assert result["username"] == "user"
     assert result["password"] == "pass"
     assert result["vhost"] == "vhost"
-    assert result["use_ssl"] == True
+    assert result["use_ssl"]
 
 def test_parse_amqp_url_no_port():
     """Test parsing a URL without a port."""
@@ -42,7 +42,7 @@ def test_parse_amqp_url_no_port():
     assert result["username"] == "user"
     assert result["password"] == "pass"
     assert result["vhost"] == "vhost"
-    assert result["use_ssl"] == False
+    assert not result["use_ssl"]
 
 def test_parse_amqp_url_no_vhost():
     """Test parsing a URL without a vhost."""
@@ -54,7 +54,7 @@ def test_parse_amqp_url_no_vhost():
     assert result["username"] == "user"
     assert result["password"] == "pass"
     assert result["vhost"] == "/"  # Default vhost
-    assert result["use_ssl"] == False
+    assert not result["use_ssl"]
 
 def test_parse_amqp_url_special_chars():
     """Test parsing a URL with special characters."""
@@ -66,4 +66,4 @@ def test_parse_amqp_url_special_chars():
     assert result["username"] == "user"
     assert result["password"] == "p@ss"
     assert result["vhost"] == "vho/st"
-    assert result["use_ssl"] == False
+    assert not result["use_ssl"]

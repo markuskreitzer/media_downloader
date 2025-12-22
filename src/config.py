@@ -57,7 +57,7 @@ def parse_amqp_url(url: str) -> Dict[str, Any]:
     """
     if not url:
         return {}
-    
+
     # Strip any surrounding quotes that might come from environment variables
     url = url.strip().strip("'\"")
 
@@ -143,6 +143,6 @@ if rabbitmq_url:
     logger.info(f"RabbitMQ configured at {rabbitmq_host}:{rabbitmq_port}, queue: {rabbitmq_queue}")
 else:
     logger.info(f"RabbitMQ configuration: {rabbitmq_host}:{rabbitmq_port}, vhost: {rabbitmq_vhost}")
-    
+
 if rabbitmq_use_ssl:
     logger.info("Using SSL for RabbitMQ connection")

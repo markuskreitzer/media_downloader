@@ -5,11 +5,11 @@ import unicodedata
 def sanitize_filename(filename: str, max_length: int = 255) -> str:
     """
     Sanitize filename to contain only UTF-8 characters and limit length.
-    
+
     Args:
         filename: Original filename
         max_length: Maximum filename length (default: 255 for most filesystems)
-        
+
     Returns:
         Sanitized filename
     """
