@@ -155,6 +155,8 @@ max-complexity = 10
 [tool.ruff.lint.extend-per-file-ignores]
 # Tests can use magic values, assertions, and longer lines
 "tests/*" = ["E501", "B011"]
+# Debug files can have higher complexity
+"src/rabbitmq_debug.py" = ["C901"]
 
 [tool.deptry]
 pep621_dev_dependency_groups = ["dev"]

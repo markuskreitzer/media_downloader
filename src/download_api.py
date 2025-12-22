@@ -173,7 +173,7 @@ async def download_media(request: DownloadRequest) -> Dict[str, str]:
         raise HTTPException(
             status_code=400,
             detail=f"Failed to download media: {str(e)}"
-        )
+        ) from e
     except Exception as e:
         # Log the error to the error log file
         error_logger.error(f"Unexpected error downloading {url}: {str(e)}")
@@ -182,7 +182,7 @@ async def download_media(request: DownloadRequest) -> Dict[str, str]:
         raise HTTPException(
             status_code=500,
             detail=f"Server error: {str(e)}"
-        )
+        ) from e
 
 
 if __name__ == "__main__":

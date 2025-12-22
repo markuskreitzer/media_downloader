@@ -100,13 +100,13 @@ async def _download_with_options(url: str, media_type: MediaType, ydl_opts: dict
         raise HTTPException(
             status_code=400,
             detail=f"Failed to download {media_type.value}: {str(e)}"
-        )
+        ) from e
     except Exception as e:
         error_logger.error(f"Unexpected error downloading {media_type.value} from {url}: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Server error: {str(e)}"
-        )
+        ) from e
 
 
 async def download_video(request: VideoDownloadRequest) -> Dict[str, Any]:
@@ -205,7 +205,7 @@ async def download_media(request: DownloadRequest) -> Dict[str, Any]:
         raise HTTPException(
             status_code=400,
             detail=f"Failed to download media: {str(e)}"
-        )
+        ) from e
     except Exception as e:
         # Log the error to the error log file
         error_logger.error(f"Unexpected error downloading {url}: {str(e)}")
@@ -214,4 +214,4 @@ async def download_media(request: DownloadRequest) -> Dict[str, Any]:
         raise HTTPException(
             status_code=500,
             detail=f"Server error: {str(e)}"
-        )
+        ) from e
