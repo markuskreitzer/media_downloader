@@ -12,7 +12,7 @@ RUN apk add --no-cache \
     g++
 
 # Upgrade pip
-RUN pip install --upgrade pip
+RUN python -m pip install --upgrade "pip>=26.2.2"
 
 # Copy project files
 COPY pyproject.toml README.md ./
