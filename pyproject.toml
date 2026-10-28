@@ -3,7 +3,7 @@ name = "media-downloader"
 version = "1.1.1"
 description = "A Python API service for downloading media from URLs via HTTP endpoints and RabbitMQ messaging"
 readme = "README.md"
-requires-python = ">=3.8.1"
+requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [
     { name = "Media Downloader Contributors" }
@@ -14,9 +14,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
@@ -78,7 +75,7 @@ dev = [
 
 [tool.black]
 line-length = 120
-target-version = ['py38']
+target-version = ['py311']
 include = '\.pyi?$'
 extend-exclude = '''
 /(
@@ -103,7 +100,7 @@ python_functions = "test_*"
 addopts = "--strict-markers --tb=short"
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
@@ -128,7 +125,7 @@ exclude_lines = [
 [tool.ruff]
 # Same as flake8 settings
 line-length = 127
-target-version = "py38"
+target-version = "py311"
 
 [tool.ruff.lint]
 # Enable flake8-bugbear (`B`) rules, in addition to the `E` and `F` rules.
